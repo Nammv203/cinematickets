@@ -14,7 +14,7 @@ use Prettus\Repository\Traits\TransformableTrait;
  * @package namespace App\Models;
  */
 class CinemaRoom extends Model implements Transformable
-
+{
     use TransformableTrait;
     use TraitsHasAudit;
     use SoftDeletes;
