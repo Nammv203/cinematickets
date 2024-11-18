@@ -13,6 +13,7 @@ use App\Repositories\LocationProvinceRepository;
 use App\Validators\CinemaValidator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Prettus\Validator\Contracts\ValidatorInterface;
 use Prettus\Validator\Exceptions\ValidatorException;
@@ -62,10 +63,10 @@ class CinemasController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
-        $cinemas = $this->repository->with('location_district')->all();
+        // $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
+        $cinemas = $this->repository->getList($request);
 
         if (request()->wantsJson()) {
             return response()->json([
