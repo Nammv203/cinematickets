@@ -24,5 +24,5 @@ class CinemaRoomChairUpdateRequest extends FormRequest
         return [
             //
         ];
-    }
+   }
 }
