@@ -1,39 +1,46 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Rules;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Models\CinemaRoom;
+use Closure;
+use Illuminate\Contracts\Validation\ValidationRule;
 
-class UserUpdateRequest extends FormRequest
+class CinemaRoomCodeUniqueRule implements ValidationRule
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
-    // public function authorize(): bool
-    // {
-    //     return false;
-    // }
+    protected $cinema_id;
+
+    protected $room_code;
+
+
+    protected $room_id;
+
+    public function __construct($cinema_id, $room_code, $room_id)
+    {
+        $this->cinema_id = $cinema_id;
+        $this->room_code = $room_code;
+        $this->room_id = $room_id;
+    }
 
     /**
-     * Get the validation rules that apply to the request.
+     * Run the validation rule.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @param  \Closure(string): \Illuminate\Translation\PotentiallyTranslatedString  $fail
      */
-    public function rules(): array
+    public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        return [
-            // 'name' => 'required',
-            // 'birthday' => 'required',
-            'role_id' => 'required',
-        ];
-    }
+        try {
+            $cinemaId = $this->cinema_id;
+            $roomCode = $this->room_code;
+            $roomId = $this->room_id;
 
-    public function attributes()
-    {
-        return [
-            'name' => 'Tên người dùng',
-            'birthday' => 'Ngày sinh',
-            'role_id' => 'Vai trò',
-        ];
+            $roomCodeOfCinemaExists = CinemaRoom::where('cinema_id',$cinemaId)
+                ->where('room_code',$roomCode)
+                ->when($roomId, function ($query, $roomId) {
+                    return $query->where('id','!=',$roomId);
+                })
+                ->exists();
+
     }
+}
 }
