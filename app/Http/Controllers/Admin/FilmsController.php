@@ -21,7 +21,7 @@ use Prettus\Validator\Exceptions\ValidatorException;
  * @package namespace App\Http\Controllers;
  */
 class FilmsController extends Controller
-{
+
     /**
      * @var FilmRepository
      */
