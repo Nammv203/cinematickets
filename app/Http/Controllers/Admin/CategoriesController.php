@@ -20,7 +20,7 @@ use Prettus\Validator\Exceptions\ValidatorException;
  * @package namespace App\Http\Controllers;
  */
 class CategoriesController extends Controller
-
+{
     /**
      * @var CategoryRepository
      */
