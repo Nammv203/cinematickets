@@ -42,7 +42,7 @@ class CinemaRoomsController extends Controller
     {
         $this->repository = $repository;
         $this->cinemaRepository = $cinemaRepository;
-    
+    }
 
     /**
      * Display a listing of the resource.
