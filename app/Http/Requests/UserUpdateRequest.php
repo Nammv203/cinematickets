@@ -42,5 +42,5 @@ class CinemaRoomCodeUniqueRule implements ValidationRule
                 ->exists();
 
     }
-}
+    }
 }
