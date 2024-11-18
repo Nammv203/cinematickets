@@ -41,5 +41,12 @@ class CinemaRoomCodeUniqueRule implements ValidationRule
                 })
                 ->exists();
 
+            if($roomCodeOfCinemaExists){
+                $fail("Mã phòng đã tồn tại.");
+            }
+
+        }catch (\Exception $exception) {
+            $fail($exception->getMessage());
+        }
     }
 }
