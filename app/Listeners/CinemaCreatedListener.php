@@ -55,7 +55,7 @@ class CinemaCreatedListener
         } catch (\Throwable $th) {
             logger($th->getMessage());
             DB::rollBack();
-        }
+        
     }
 
 //    private function getChairType($chairNumber)
