@@ -10,7 +10,6 @@ use App\Models\Cinema;
 use App\Models\CinemaRoom;
 use App\Models\Film;
 use App\Repositories\SchedulePublishFilmRepository;
-use Illuminate\Http\Request;
 use Prettus\Validator\Contracts\ValidatorInterface;
 use Prettus\Validator\Exceptions\ValidatorException;
 
@@ -41,21 +40,10 @@ class SchedulePublishFilmsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index()
     {
         $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
-        $schedulePublishFilms = $this->repository
-            ->when($request->cinema_id, function ($query) use ($request) {
-                $query->whereHas('cinemaRoom', function ($query) use ($request) {
-                    $query->where('cinema_id', $request->cinema_id);
-                });
-            })
-            ->when($request->cinema_room_id, function ($query) use ($request) {
-                $query->where('cinema_room_id', $request->cinema_room_id);
-            })
-            ->orderBy('id','desc')
-            ->paginate(20);
-        $cinemas = Cinema::all();
+        $schedulePublishFilms = $this->repository->paginate(20);
 
         if (request()->wantsJson()) {
 
@@ -64,7 +52,7 @@ class SchedulePublishFilmsController extends Controller
             ]);
         }
 
-        return view('backend.schedulePublishFilms.index', compact('schedulePublishFilms','cinemas'));
+        return view('backend.schedulePublishFilms.index', compact('schedulePublishFilms'));
     }
 
     public function create()
