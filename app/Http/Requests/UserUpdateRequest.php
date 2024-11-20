@@ -24,7 +24,7 @@ class UserUpdateRequest extends FormRequest
         return [
             'name' => 'required',
             'birthday' => 'required',
-            'role_id' => 'required',
+            
         ];
     }
 
