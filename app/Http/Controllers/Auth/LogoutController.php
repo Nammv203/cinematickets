@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 
 class LogoutController extends Controller
 {
-    public function logout(Request $request)
+    public function postLogout(Request $request)
     {
         Auth::logout();
 
@@ -16,6 +16,6 @@ class LogoutController extends Controller
         $request->session()->regenerateToken();
 
         toastr()->success('Đăng xuất thành công.');
-        return redirect()->route('home');
+        return redirect()->route('client.home');
     }
-}
+};
