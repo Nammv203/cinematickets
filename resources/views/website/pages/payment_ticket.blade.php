@@ -19,7 +19,7 @@
 		<div class="container">
 			<div class="row">
 				<div class="col-xl-3 col-lg-3 col-md-3 col-sm-12 col-12">
-					<div class="st_bt_top_back_btn float_left">	<a href="{{route('client.movies.seat_booking')}}"><i class="fas fa-long-arrow-alt-left"></i> &nbsp;Back</a>
+					<div class="st_bt_top_back_btn float_left">	<a style="cursor: pointer" onclick="history.back()"><i class="fas fa-long-arrow-alt-left"></i> &nbsp;Trở lại</a>
 					</div>
 				</div>
 				<div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12">
@@ -68,13 +68,13 @@
 							</div>
 							<div class="col-md-12">
 								<div class="st_cherity_btn float_left">
-									<h3>SELECT TICKET TYPE</h3>
+									<h3></h3>
 									<ul>
-										<li><a href="#"><i class="flaticon-tickets"></i> &nbsp;M-Ticket</a>
-										</li>
-										<li><a href="#"><i class="flaticon-tickets"></i> &nbsp;Box office Pickup </a>
-										</li>
-										<li><a href="{{route('client.movies.show.confirm-payment')}}">Proceed to Pay </a>
+{{--										<li><a href="#"><i class="flaticon-tickets"></i> &nbsp;M-Ticket</a>--}}
+{{--										</li>--}}
+{{--										<li><a href="#"><i class="flaticon-tickets"></i> &nbsp;Box office Pickup </a>--}}
+{{--										</li>--}}
+										<li><a href="{{route('auth.client.movies.show.confirm-payment')}}">Tiếp tục thanh toán</a>
 										</li>
 									</ul>
 								</div>
@@ -87,7 +87,7 @@
 						<div class="col-md-12">
 							<div class="st_dtts_bs_wrapper float_left">
 								<div class="st_dtts_bs_heading float_left">
-									<p>Booking summary</p>
+									<p>Tỏng quan đơn hàng</p>
 								</div>
 								<div class="st_dtts_sb_ul float_left">
 									<ul>
@@ -120,18 +120,18 @@
 	<script>
 		//* Isotope js
 		    function protfolioIsotope(){
-		        if ( $('.st_fb_filter_left_box_wrapper').length ){ 
+		        if ( $('.st_fb_filter_left_box_wrapper').length ){
 		            // Activate isotope in container
 		            $(".protfoli_inner, .portfoli_inner").imagesLoaded( function() {
 		                $(".protfoli_inner, .portfoli_inner").isotope({
-		                    layoutMode: 'masonry',  
-		                }); 
-		            });  
-		            
-		            // Add isotope click function 
+		                    layoutMode: 'masonry',
+		                });
+		            });
+
+		            // Add isotope click function
 		            $(".protfoli_filter li").on('click',function(){
 		                $(".protfoli_filter li").removeClass("active");
-		                $(this).addClass("active"); 
+		                $(this).addClass("active");
 		                var selector = $(this).attr("data-filter");
 		                $(".protfoli_inner, .portfoli_inner").isotope({
 		                    filter: selector,
@@ -142,11 +142,11 @@
 		                    }
 		                });
 		                return false;
-		            });  
+		            });
 		        };
-		    }; 
-		 protfolioIsotope (); 
-		 
+		    };
+		 protfolioIsotope ();
+
 		  function changeQty(increase) {
 				            var qty = parseInt($('.select_number').find("input").val());
 				            if (!isNaN(qty)) {

@@ -23,5 +23,5 @@ class CinemaRoomCreatedEvent
     public function __construct(CinemaRoom $cinemaRoom)
     {
         $this->cinemaRoom = $cinemaRoom;
-    }
+    
 }
