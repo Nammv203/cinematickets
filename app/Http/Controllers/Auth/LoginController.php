@@ -40,8 +40,7 @@ class LoginController extends Controller
             toastr()->error('Tài khoản hoặc mật khẩu không chính xác!');
             return redirect()->back();
         }catch (\Throwable $th) {
-            dd($th);
-            toastr()->error('Đăng nhập thất bại.');
+            toastr()->error('Đăng nhập thất bại. Vui lòng đăng nhập lại ');
             Log::error($th->getMessage());
             return redirect()->back();
         }

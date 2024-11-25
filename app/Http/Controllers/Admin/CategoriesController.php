@@ -8,6 +8,7 @@ use App\Http\Requests\CategoryCreateRequest;
 use App\Http\Requests\CategoryUpdateRequest;
 use App\Repositories\CategoryRepository;
 use App\Validators\CategoryValidator;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -48,10 +49,11 @@ class CategoriesController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
-        $categories = $this->repository->all();
+        //        $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
+        $categories = $this->repository->getList($request);
+
 
         if (request()->wantsJson()) {
 
@@ -123,16 +125,16 @@ class CategoriesController extends Controller
      */
     public function show($id)
     {
-        // $category = $this->repository->find($id);
+        $category = $this->repository->find($id);
 
-        // if (request()->wantsJson()) {
+        if (request()->wantsJson()) {
 
-        //     return response()->json([
-        //         'data' => $category,
-        //     ]);
-        // }
+            return response()->json([
+                'data' => $category,
+            ]);
+        }
 
-        // return view('backend.categories.index');
+        return view('backend.categories.index');
     }
 
     /**
@@ -198,8 +200,7 @@ class CategoriesController extends Controller
             DB::commit();
             toastr()->success('Cập nhật loại phim thành công');
             return redirect()->route('admin.category.index');
-
-        } catch (ValidatorException $e) {
+         } catch (ValidatorException $e) {
             DB::rollBack();
             Log::error($e->getMessage());
 
