@@ -200,7 +200,6 @@ class CategoriesController extends Controller
             DB::commit();
             toastr()->success('Cập nhật loại phim thành công');
             return redirect()->route('admin.category.index');
-duybd
          } catch (ValidatorException $e) {
             DB::rollBack();
             Log::error($e->getMessage());
@@ -215,10 +214,6 @@ duybd
             toastr()->error('Lỗi! Hãy liên hệ admin');
             return redirect()->back()->withErrors($e->getMessageBag())->withInput();
         }
-
-
-       
-develop
     }
 
 
