@@ -124,16 +124,16 @@ class CategoriesController extends Controller
      */
     public function show($id)
     {
-        // $category = $this->repository->find($id);
+        $category = $this->repository->find($id);
 
-        // if (request()->wantsJson()) {
+        if (request()->wantsJson()) {
 
-        //     return response()->json([
-        //         'data' => $category,
-        //     ]);
-        // }
+            return response()->json([
+                'data' => $category,
+            ]);
+        }
 
-        // return view('backend.categories.index');
+        return view('backend.categories.index');
     }
 
     /**
@@ -200,20 +200,7 @@ class CategoriesController extends Controller
             toastr()->success('Cập nhật loại phim thành công');
             return redirect()->route('admin.category.index');
 
-        } catch (ValidatorException $e) {
-            DB::rollBack();
-            Log::error($e->getMessage());
-
-            if ($request->wantsJson()) {
-                return response()->json([
-                    'error'   => true,
-                    'message' => $e->getMessageBag()
-                ]);
-            }
-
-            toastr()->error('Lỗi! Hãy liên hệ admin');
-            return redirect()->back()->withErrors($e->getMessageBag())->withInput();
-        }
+       
     }
 
 

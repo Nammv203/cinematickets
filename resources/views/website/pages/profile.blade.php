@@ -1,26 +1,24 @@
-<!DOCTYPE html>
+@extends('website.layouts.layout2')
 
-<html lang="en">
+@section('title', 'Thông tin tài khoản')
 
-<head>
-    @include('website.partials.head')
-
+@push('css')
     <style>
-        body {
-            background: #f5f5f5;
-        }
         .ui-w-80 {
             width: 80px !important;
             height: auto;
         }
+
         label.btn {
             margin-bottom: 0;
         }
+
         .btn-outline-primary {
             border-color: #26B4FF;
             background: transparent;
             color: #26B4FF;
         }
+
         .btn {
             cursor: pointer;
         }
@@ -58,52 +56,8 @@
             opacity: 0;
         }
 
-        .account-settings-links .list-group-item.active {
-            font-weight: bold !important;
-        }
-
-        html:not(.dark-style) .account-settings-links .list-group-item.active {
-            background: transparent !important;
-        }
-
         .account-settings-multiselect~.select2-container {
             width: 100% !important;
-        }
-
-        .light-style .account-settings-links .list-group-item {
-            padding: 0.85rem 1.5rem;
-            border-color: rgba(24, 28, 33, 0.03) !important;
-        }
-
-        .light-style .account-settings-links .list-group-item.active {
-            color: #4e5155 !important;
-        }
-
-        .material-style .account-settings-links .list-group-item {
-            padding: 0.85rem 1.5rem;
-            border-color: rgba(24, 28, 33, 0.03) !important;
-        }
-
-        .material-style .account-settings-links .list-group-item.active {
-            color: #4e5155 !important;
-        }
-
-        .dark-style .account-settings-links .list-group-item {
-            padding: 0.85rem 1.5rem;
-            border-color: rgba(255, 255, 255, 0.03) !important;
-        }
-
-        .dark-style .account-settings-links .list-group-item.active {
-            color: #fff !important;
-        }
-
-        .light-style .account-settings-links .list-group-item.active {
-            color: #4E5155 !important;
-        }
-
-        .light-style .account-settings-links .list-group-item {
-            padding: 0.85rem 1.5rem;
-            border-color: rgba(24, 28, 33, 0.03) !important;
         }
 
         /*  */
@@ -170,183 +124,140 @@
             transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
             transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, -webkit-box-shadow 0.15s ease-in-out;
         }
-        .container {
-            margin-top: 150px;
-        }
     </style>
-</head>
+@endpush
 
-<body>
-    @include('website.partials.header')
+@section('page-content')
 
-    <div class="container light-style flex-grow-1 container-p-y">
+    <div class="row">
+        <div class="col-12">
+            <!-- Form START -->
+            <div class="row mb-5 gx-5">
+                <!-- Contact detail -->
+                <div class="col-xxl-8 mb-xxl-0">
+                    <div class="bg-secondary-soft px-4 py-3 rounded">
+                        <div class="row g-3">
 
-        <h4 class="mb-3">
-            Tài khoản của tôi
-        </h4>
+                            <form action="{{ route('auth.profile.update') }}" method="post">
+                                @csrf
+                                @method('PATCH')
 
-        <div class="card overflow-hidden">
-            <div class="row no-gutters row-bordered row-border-light">
-                <div class="col-md-3 mt-0">
+                                <!-- -->
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" class="form-control" name="email" aria-label="Email"
+                                        value="{{ $user->email }}" readonly disabled>
+                                </div>
 
-                    <div class="list-group list-group-flush account-settings-links">
-                        <a class="list-group-item list-group-item-action active" data-toggle="list"
-                            href="{{ route('auth.profile') }}">
-                            Tài khoản</a>
+                                <!-- -->
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Họ tên
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" class="form-control" name="name" aria-label="Họ tên"
+                                        value="{{ $user->name }}">
 
-                        <a class="list-group-item list-group-item-action" data-toggle="list" href="#account-info">
-                            Đơn mua</a>
+                                    @error('name')
+                                        <span class="text-danger">{{ $errors->first('name') }}</span>
+                                    @enderror
+                                </div>
 
-                        <a class="list-group-item list-group-item-action" data-toggle="list" href="#account-info">
-                            Lịch sử mua
-                        </a>
+                                <!-- -->
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">SDT
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" class="form-control" name="phone" aria-label="SDT"
+                                        value="{{ $user->phone }}">
+
+                                    @error('phone')
+                                        <span class="text-danger">{{ $errors->first('phone') }}</span>
+                                    @enderror
+                                </div>
+
+                                <!-- -->
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Ngày sinh
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="date" class="form-control" name="birthday" aria-label="Ngày sinh"
+                                        value="{{ $user->birthday }}">
+
+                                    @error('birthday')
+                                        <span class="text-danger">{{ $errors->first('birthday') }}</span>
+                                    @enderror
+                                </div>
+
+                                <div class="col-md-12 text-right mt-3 mr-3">
+                                    <button type="submit" class="btn btn-primary">Lưu</button>&nbsp;
+                                </div>
+                            </form>
+                        </div> <!-- Row END -->
                     </div>
                 </div>
-                <div class="col-md-9">
+            </div> <!-- Row END -->
 
-                    <div class="row">
-                        <div class="col-12">
-                            <!-- Form START -->
-                            <div class="row mb-5 gx-5">
-                                <!-- Contact detail -->
-                                <div class="col-xxl-8 mb-xxl-0">
-                                    <div class="bg-secondary-soft px-4 py-3 rounded">
-                                        <div class="row g-3">
+            <!-- Social media detail -->
+            <div class="row mb-5 gx-5">
+                <!-- change password -->
+                <div class="col-xxl-6">
+                    <div class="bg-secondary-soft px-4 pb-3 rounded">
+                        <div class="row g-3">
+                            <label class="my-4 pl-3">Đổi mật khẩu</label>
 
-                                            <form action="{{ route('auth.profile.update') }}" method="post">
-                                                @csrf
-                                                @method('PATCH')
+                            <form action="{{ route('auth.profile.change-password') }}" method="post">
+                                @csrf
+                                @method('PATCH')
 
-                                                <!-- -->
-                                                <div class="col-md-6 mb-3">
-                                                    <label class="form-label">Email</label>
-                                                    <input type="email" class="form-control" name="email"
-                                                        aria-label="Email" value="{{ $user->email }}" readonly
-                                                        disabled>
-                                                </div>
+                                <!-- Old password -->
+                                <div class="col-md-12 mb-3">
+                                    <label for="exampleInputPassword1" class="form-label">
+                                        Mật khẩu cũ
+                                    </label>
+                                    <input type="password" class="form-control" id="exampleInputPassword1"
+                                        name="current_password">
 
-                                                <!-- -->
-                                                <div class="col-md-6 mb-3">
-                                                    <label class="form-label">Họ tên
-                                                        <span class="text-danger">*</span>
-                                                    </label>
-                                                    <input type="text" class="form-control" name="name"
-                                                        aria-label="Họ tên" value="{{ $user->name }}">
-
-                                                    @error('name')
-                                                        <span class="text-danger">{{ $errors->first('name') }}</span>
-                                                    @enderror
-                                                </div>
-
-                                                <!-- -->
-                                                <div class="col-md-6 mb-3">
-                                                    <label class="form-label">SDT
-                                                        <span class="text-danger">*</span>
-                                                    </label>
-                                                    <input type="text" class="form-control" name="phone"
-                                                        aria-label="SDT" value="{{ $user->phone }}">
-
-                                                    @error('phone')
-                                                        <span class="text-danger">{{ $errors->first('phone') }}</span>
-                                                    @enderror
-                                                </div>
-
-                                                <!-- -->
-                                                <div class="col-md-6 mb-3">
-                                                    <label class="form-label">Ngày sinh
-                                                        <span class="text-danger">*</span>
-                                                    </label>
-                                                    <input type="date" class="form-control" name="birthday"
-                                                        aria-label="Ngày sinh" value="{{ $user->birthday }}">
-
-                                                    @error('birthday')
-                                                        <span class="text-danger">{{ $errors->first('birthday') }}</span>
-                                                    @enderror
-                                                </div>
-
-                                                <div class="col-md-12 text-right mt-3 mr-3">
-                                                    <button type="submit" class="btn btn-primary">Lưu</button>&nbsp;
-                                                </div>
-                                            </form>
-                                        </div> <!-- Row END -->
-                                    </div>
+                                    @error('current_password')
+                                        <span class="text-danger">{{ $errors->first('current_password') }}</span>
+                                    @enderror
                                 </div>
-                            </div> <!-- Row END -->
 
-                            <!-- Social media detail -->
-                            <div class="row mb-5 gx-5">
-                                <!-- change password -->
-                                <div class="col-xxl-6">
-                                    <div class="bg-secondary-soft px-4 pb-3 rounded">
-                                        <div class="row g-3">
-                                            <label class="my-4 pl-3">Đổi mật khẩu</label>
+                                <!-- New password -->
+                                <div class="col-md-12 mb-3">
+                                    <label for="exampleInputPassword2" class="form-label">
+                                        Mật khẩu mới
+                                    </label>
+                                    <input type="password" class="form-control" id="exampleInputPassword2"
+                                        name="new_password">
 
-                                            <form action="{{ route('auth.profile.change-password') }}" method="post">
-                                                @csrf
-                                                @method('PATCH')
-
-                                                <!-- Old password -->
-                                                <div class="col-md-12 mb-3">
-                                                    <label for="exampleInputPassword1" class="form-label">
-                                                        Mật khẩu cũ
-                                                    </label>
-                                                    <input type="password" class="form-control"
-                                                        id="exampleInputPassword1" name="current_password">
-
-                                                    @error('current_password')
-                                                        <span
-                                                            class="text-danger">{{ $errors->first('current_password') }}</span>
-                                                    @enderror
-                                                </div>
-
-                                                <!-- New password -->
-                                                <div class="col-md-12 mb-3">
-                                                    <label for="exampleInputPassword2" class="form-label">
-                                                        Mật khẩu mới
-                                                    </label>
-                                                    <input type="password" class="form-control"
-                                                        id="exampleInputPassword2" name="new_password">
-
-                                                    @error('new_password')
-                                                        <span
-                                                            class="text-danger">{{ $errors->first('new_password') }}</span>
-                                                    @enderror
-                                                </div>
-
-                                                <!-- Confirm password -->
-                                                <div class="col-md-12 mb-3">
-                                                    <label for="exampleInputPassword3" class="form-label">
-                                                        Xác nhận mật khẩu
-                                                    </label>
-                                                    <input type="password" class="form-control"
-                                                        id="exampleInputPassword3" name="new_password_confirmation">
-
-                                                    @error('new_password_confirmation')
-                                                        <span
-                                                            class="text-danger">{{ $errors->first('new_password_confirmation') }}</span>
-                                                    @enderror
-                                                </div>
-
-                                                <div class="col-md-12 text-right mt-3 mr-3">
-                                                    <button type="submit" class="btn btn-primary">Lưu</button>&nbsp;
-                                                </div>
-
-                                            </form>
-                                        </div>
-                                    </div>
+                                    @error('new_password')
+                                        <span class="text-danger">{{ $errors->first('new_password') }}</span>
+                                    @enderror
                                 </div>
-                            </div> <!-- Row END -->
+
+                                <!-- Confirm password -->
+                                <div class="col-md-12 mb-3">
+                                    <label for="exampleInputPassword3" class="form-label">
+                                        Xác nhận mật khẩu
+                                    </label>
+                                    <input type="password" class="form-control" id="exampleInputPassword3"
+                                        name="new_password_confirmation">
+
+                                    @error('new_password_confirmation')
+                                        <span class="text-danger">{{ $errors->first('new_password_confirmation') }}</span>
+                                    @enderror
+                                </div>
+
+                                <div class="col-md-12 text-right mt-3 mr-3">
+                                    <button type="submit" class="btn btn-primary">Lưu</button>&nbsp;
+                                </div>
+
+                            </form>
                         </div>
                     </div>
-
                 </div>
-            </div>
+            </div> <!-- Row END -->
         </div>
     </div>
 
-    <!-- prs theater Slider End -->
-    @include('website.partials.script')
-
-</body>
-
-</html>
+@endsection
