@@ -236,27 +236,6 @@ class FilmsController extends Controller
      * @param  int $id
      *
      * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        $film = $this->repository->find($id);
+    
 
-        $checkFileIsset = Storage::exists(config('filesystems.folder_storage_admin.film') . $film->picture);
-        if ($checkFileIsset) {
-            Storage::delete(config('filesystems.folder_storage_admin.film') . $film->picture);
-        }
-
-        $deleted = $film->delete();
-
-        if (request()->wantsJson()) {
-            return response()->json([
-                'message' => 'Film deleted.',
-                'deleted' => $deleted,
-            ]);
-        }
-
-        toastr()->success('Xóa phim thành công');
-
-        return redirect()->back()->with('message', 'Film deleted.');
-    }
-}
+    

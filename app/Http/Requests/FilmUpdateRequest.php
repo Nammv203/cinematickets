@@ -31,7 +31,6 @@ class FilmUpdateRequest extends FormRequest
             'publish_at' => 'required'
         ];
     }
-
     public function messages()
     {
         return [
@@ -44,4 +43,5 @@ class FilmUpdateRequest extends FormRequest
             'publish_at.required' => 'Trường thời gian xuất bản là bắt buộc.'
         ];
     }
+    
 }
