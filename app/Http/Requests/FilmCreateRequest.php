@@ -45,5 +45,5 @@ class FilmCreateRequest extends FormRequest
             'time_duration.required' => 'Trường thời lượng là bắt buộc.',
             'publish_at.required' => 'Trường thời gian xuất bản là bắt buộc.'
         ];
-    }
+    
 }
