@@ -45,21 +45,7 @@ class FilmsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
-    {
-        $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
-        $films = $this->repository->all();
-
-        if (request()->wantsJson()) {
-
-            return response()->json([
-                'data' => $films,
-            ]);
-        }
-
-        return view('films.index', compact('films'));
-    }
-
+   
     /**
      * Store a newly created resource in storage.
      *
