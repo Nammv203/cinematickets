@@ -11,7 +11,6 @@ use App\Models\CinemaRoom;
 use App\Models\Film;
 use App\Repositories\SchedulePublishFilmRepository;
 use Illuminate\Http\Request;
-use Prettus\Validator\Contracts\ValidatorInterface;
 use Prettus\Validator\Exceptions\ValidatorException;
 
 /**
@@ -53,7 +52,7 @@ class SchedulePublishFilmsController extends Controller
             ->when($request->cinema_room_id, function ($query) use ($request) {
                 $query->where('cinema_room_id', $request->cinema_room_id);
             })
-            ->orderBy('id','desc')
+            ->orderBy('id', 'desc')
             ->paginate(20);
         $cinemas = Cinema::all();
 
@@ -64,7 +63,7 @@ class SchedulePublishFilmsController extends Controller
             ]);
         }
 
-        return view('backend.schedulePublishFilms.index', compact('schedulePublishFilms','cinemas'));
+        return view('backend.schedulePublishFilms.index', compact('schedulePublishFilms', 'cinemas'));
     }
 
     public function create()
@@ -73,13 +72,13 @@ class SchedulePublishFilmsController extends Controller
         $cinemas = Cinema::all();
         $cinemaRooms = CinemaRoom::all();
 
-        return view('backend.schedulePublishFilms.create', compact('films','cinemas','cinemaRooms'));
+        return view('backend.schedulePublishFilms.create', compact('films', 'cinemas', 'cinemaRooms'));
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  SchedulePublishFilmCreateRequest $request
+     * @param SchedulePublishFilmCreateRequest $request
      *
      * @return \Illuminate\Http\Response
      *
@@ -93,7 +92,7 @@ class SchedulePublishFilmsController extends Controller
 
             $response = [
                 'message' => 'SchedulePublishFilm created.',
-                'data'    => $schedulePublishFilm->toArray(),
+                'data' => $schedulePublishFilm->toArray(),
             ];
             toastr()->success('Tạo thành công.');
             if ($request->wantsJson()) {
@@ -106,8 +105,8 @@ class SchedulePublishFilmsController extends Controller
             toastr()->error('Tạo thất bại.');
             if ($request->wantsJson()) {
                 return response()->json([
-                    'error'   => true,
-                    'message' => $e->getMessageBag()
+                    'error' => true,
+                    'message' => $e->getMessageBag(),
                 ]);
             }
 
@@ -118,7 +117,7 @@ class SchedulePublishFilmsController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int $id
+     * @param int $id
      *
      * @return \Illuminate\Http\Response
      */
@@ -136,13 +135,13 @@ class SchedulePublishFilmsController extends Controller
             ]);
         }
 
-        return view('backend.schedulePublishFilms.edit', compact('schedulePublishFilm','films','cinemas','cinemaRooms'));
+        return view('backend.schedulePublishFilms.edit', compact('schedulePublishFilm', 'films', 'cinemas', 'cinemaRooms'));
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int $id
+     * @param int $id
      *
      * @return \Illuminate\Http\Response
      */
@@ -151,6 +150,22 @@ class SchedulePublishFilmsController extends Controller
         $schedulePublishFilm = $this->repository->find($id);
 
         return view('schedulePublishFilms.edit', compact('schedulePublishFilm'));
+    }
+
+    public function showRoomMap(Request $request, $id)
+    {
+        $schedulePublish = $this->repository->find($id);
+
+        $chairBooked = [];
+        foreach ($schedulePublish->ticketOrder as $key => $ticketOrders) {
+
+            foreach ($ticketOrders->ticketOrderItems as $key => $ticketOrderItem) {
+                $chairBooked[] = $ticketOrderItem->chair_code;
+            }
+
+        }
+
+        return view('backend.schedulePublishFilms.room_map', compact('schedulePublish', 'chairBooked'));
     }
 
     /**
@@ -171,7 +186,7 @@ class SchedulePublishFilmsController extends Controller
 
             $response = [
                 'message' => 'SchedulePublishFilm updated.',
-                'data'    => $schedulePublishFilm->toArray(),
+                'data' => $schedulePublishFilm->toArray(),
             ];
             toastr()->success('Cập nhật thành công.');
             if ($request->wantsJson()) {
@@ -185,15 +200,14 @@ class SchedulePublishFilmsController extends Controller
             if ($request->wantsJson()) {
 
                 return response()->json([
-                    'error'   => true,
-                    'message' => $e->getMessageBag()
+                    'error' => true,
+                    'message' => $e->getMessageBag(),
                 ]);
             }
 
             return redirect()->back()->withErrors($e->getMessageBag())->withInput();
         }
     }
-
 
     /**
      * Remove the specified resource from storage.

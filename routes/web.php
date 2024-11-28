@@ -61,6 +61,10 @@ Route::group([
         Route::get('/ticket-purchase-history', [OrderWebsiteController::class, 'ticketPurchaseHistory'])
             ->name('ticket-purchase-history');
 
+        // ticket purchase history detail
+        Route::get('/ticket-purchase-history/{ticket}', [OrderWebsiteController::class, 'ticketPurchaseHistoryDetail'])
+        ->name('ticket-purchase-history-detail');
+
         // booking
         Route::name('client.')->group(function () {
             Route::get('/movie-booking/payment', [OrderWebsiteController::class, 'showPagePaymentTicket'])->name('movies.show.payment');
@@ -128,3 +132,5 @@ Route::group([
         });
     });
 });
+
+Route::get('vnpay/return/{order_id}', [\App\Http\Controllers\Website\VnPayController::class,'vnpayReturn'])->name('vnpay.return');

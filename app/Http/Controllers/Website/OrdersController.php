@@ -5,14 +5,16 @@ namespace App\Http\Controllers\Website;
 use App\Helpers\Constants;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SaveTicketOrderRequest;
+use App\Repositories\CinemaRepository;
 use App\Repositories\CinemaRoomChairRepository;
+use App\Repositories\CinemaRoomRepository;
 use App\Repositories\SchedulePublishFilmRepository;
 use App\Repositories\TicketOrderItemRepository;
 use App\Repositories\TicketOrderRepository;
-use Illuminate\Http\Request;
+use App\Services\PaymentVnpayService;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
-
 
 class OrdersController extends Controller
 {
@@ -25,23 +27,34 @@ class OrdersController extends Controller
 
     protected $ticketOrderItemRepository;
 
+    protected $paymentVnpayService;
+
+    protected $cinemaRepository;
+
+    protected $cinemaRoomRepository;
+
     public function __construct(
         SchedulePublishFilmRepository $scheduleRepository,
         CinemaRoomChairRepository $cinemaRoomChairRepository,
         TicketOrderRepository $ticketOrderRepository,
-        TicketOrderItemRepository $ticketOrderItemRepository
-    )
-    {
+        TicketOrderItemRepository $ticketOrderItemRepository,
+        PaymentVnpayService $paymentVnpayService,
+        CinemaRepository $cinemaRepository,
+        CinemaRoomRepository $cinemaRoomRepository
+    ) {
         $this->scheduleRepository = $scheduleRepository;
         $this->cinemaRoomChairRepository = $cinemaRoomChairRepository;
         $this->ticketOrderRepository = $ticketOrderRepository;
         $this->ticketOrderItemRepository = $ticketOrderItemRepository;
+        $this->paymentVnpayService = $paymentVnpayService;
+        $this->cinemaRepository = $cinemaRepository;
+        $this->cinemaRoomRepository = $cinemaRoomRepository;
     }
 
     public function showPagePaymentTicket()
     {
         $order = Session::get('order');
-        if(empty($order)){
+        if (empty($order)) {
             toastr()->error('Không có vé nào được đặt!');
             return redirect()->route('client.home');
         }
@@ -50,24 +63,23 @@ class OrdersController extends Controller
         $schedule = $this->scheduleRepository->find($order['schedule_id']);
         $orderDetail = [];
 
-        foreach ($order['cb'] as $chairId)
-        {
-            if($this->cinemaRoomChairRepository->find($chairId)){
+        foreach ($order['cb'] as $chairId) {
+            if ($this->cinemaRoomChairRepository->find($chairId)) {
                 $orderDetail[] = $this->cinemaRoomChairRepository->find($chairId);
             }
         }
 
         $ticketString = collect($orderDetail)->map(function ($item) {
-            return $item->chair_code."(".$this->getChairTypeText($item->chair_type).")";
+            return $item->chair_code . "(" . getChairTypeText($item->chair_type) . ")";
         })->implode(',');
 
         $totalTicket = collect($orderDetail)->pluck('chair_code')->count() ?? 0;
         $sumChairTypePrice = collect($orderDetail)->reduce(function ($carry, $item) {
             return $carry + $this->getChairTypePrice($item->chair_type);
-        },0);
+        }, 0);
         $netPrice = ($schedule->ticket_price * $totalTicket) + $sumChairTypePrice; // ticket_price * total_ticket
 
-        return view('website.pages.payment_ticket', compact('schedule','ticketString','totalTicket','netPrice','sumChairTypePrice'));
+        return view('website.pages.payment_ticket', compact('schedule', 'ticketString', 'totalTicket', 'netPrice', 'sumChairTypePrice'));
     }
 
     public function saveTicketOrder(SaveTicketOrderRequest $request)
@@ -77,7 +89,7 @@ class OrdersController extends Controller
 
             $order = Session::get('order');
 
-            if(empty($order) || !auth()->check()){
+            if (empty($order) || !auth()->check()) {
                 return redirect()->route('client.home');
             }
 
@@ -89,15 +101,13 @@ class OrdersController extends Controller
                 'grand_total' => $request['grand_total'],
             ]);
 
-            if(!$ticketOrder || !$schedule)
-            {
+            if (!$ticketOrder || !$schedule) {
                 toastr()->error('Đặt vé thất bại!');
                 return redirect()->back();
             }
 
             // save to ticket_order_items
-            foreach ($order['cb'] as $chairId)
-            {
+            foreach ($order['cb'] as $chairId) {
                 $chair = $this->cinemaRoomChairRepository->find($chairId);
                 $this->ticketOrderItemRepository->create([
                     'ticket_order_id' => $ticketOrder->id,
@@ -111,18 +121,31 @@ class OrdersController extends Controller
 
             DB::commit();
 
+            $customer = auth()->user();
+            // payment vnpay
+            $orderData = [
+                'order_id' => $ticketOrder->id,
+                'grand_total' => $ticketOrder->grand_total,
+                'phone' => $customer->phone,
+                'email' => $customer->email,
+                'name' => $customer->name,
+            ];
+
             // forget session order
             Session::forget('order');
 
-            toastr()->success('Đặt vé thành công!');
+            return $this->paymentVnpayService->paymentVnpay($request, $orderData);
 
-            // send flash session to confirm payment page
-
-            return redirect()->route('auth.client.movies.show.confirm-payment')->with([
-                'flashDataOrder' => $order,
-                'ticketOrder' => $ticketOrder
-            ]);
-        }catch (\Exception $exception){
+            //            toastr()->success('Đặt vé thành công!');
+//
+//            // send flash session to confirm payment page
+//
+//            return redirect()->route('auth.client.movies.show.confirm-payment')->with([
+//                'flashDataOrder' => $order,
+//                'ticketOrder' => $ticketOrder
+//            ]);
+        } catch (\Exception $exception) {
+            Log::error($exception->getMessage());
             DB::rollBack();
             toastr()->error('Đặt vé thất bại!');
             return redirect()->route('client.home');
@@ -134,7 +157,7 @@ class OrdersController extends Controller
         try {
             $order = Session::get('flashDataOrder');
 
-            if(empty($order)){
+            if (empty($order)) {
                 return redirect()->route('client.home');
             }
 
@@ -142,25 +165,24 @@ class OrdersController extends Controller
             $schedule = $this->scheduleRepository->find($order['schedule_id']);
             $orderDetail = [];
 
-            foreach ($order['cb'] as $chairId)
-            {
-                if($this->cinemaRoomChairRepository->find($chairId)){
+            foreach ($order['cb'] as $chairId) {
+                if ($this->cinemaRoomChairRepository->find($chairId)) {
                     $orderDetail[] = $this->cinemaRoomChairRepository->find($chairId);
                 }
             }
 
             $ticketString = collect($orderDetail)->map(function ($item) {
-                return $item->chair_code."(".$this->getChairTypeText($item->chair_type).")";
+                return $item->chair_code . "(" . getChairTypeText($item->chair_type) . ")";
             })->implode(',');
 
             $totalTicket = collect($orderDetail)->pluck('chair_code')->count() ?? 0;
             $sumChairTypePrice = collect($orderDetail)->reduce(function ($carry, $item) {
                 return $carry + $this->getChairTypePrice($item->chair_type);
-            },0);
+            }, 0);
             $netPrice = ($schedule->ticket_price * $totalTicket) + $sumChairTypePrice; // ticket_price * total_ticket
 
-            return view('website.pages.confirmation_payment', compact('schedule','ticketString','totalTicket','netPrice'));
-        }catch (\Throwable $exception){
+            return view('website.pages.confirmation_payment', compact('schedule', 'ticketString', 'totalTicket', 'netPrice'));
+        } catch (\Throwable $exception) {
             logger($exception->getMessage());
             return redirect()->route('client.home');
         }
@@ -177,20 +199,17 @@ class OrdersController extends Controller
         return $mapping[$code] ?? Constants::PRICE_CHAIR_TYPE_D;
     }
 
-    private function getChairTypeText($code)
+    public function ticketPurchaseHistory()
     {
-        $mapping = [
-            0 => 'A',
-            1 => 'B',
-            2 => 'C',
-        ];
-
-        return $mapping[$code] ?? 'D';
-    }
-
-    public function ticketPurchaseHistory(){
         $ticketOrders = $this->ticketOrderRepository->findByField('user_id', auth()->id());
 
         return view('website.pages.ticket_purchase_history', compact('ticketOrders'));
+    }
+
+    public function ticketPurchaseHistoryDetail($id)
+    {
+        $ticketOrderItems = $this->ticketOrderItemRepository->findByField('ticket_order_id', $id);
+
+        return view('website.pages.ticket_purchase_history_detail', compact('ticketOrderItems'));
     }
 }
